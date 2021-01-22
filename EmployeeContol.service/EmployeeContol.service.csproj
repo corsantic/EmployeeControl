@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EmployeeContol.model\EmployeeContol.model.csproj" />
+    <ProjectReference Include="..\EmployeeControl.repository\EmployeeControl.repository.csproj" />
+  </ItemGroup>
+
+</Project>
