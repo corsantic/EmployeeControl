@@ -13,6 +13,8 @@ namespace EmployeeContol.model
         public string Password { get; set; }
         public int VacationDateCount { get; set; }
         public int RoleId { get; set; }
-        [Write(false)] public string Token { get; set; }
+
+        [Write(false)]
+        public string Token { get; set; }
     }
-}
+}   

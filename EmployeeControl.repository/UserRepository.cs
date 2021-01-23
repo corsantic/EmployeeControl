@@ -30,19 +30,14 @@ namespace EmployeeControl.repository
             using (var connection = DataLayer.GetConnection(_configuration))
             {
                 var sql =
-                    $@"select * from User WHERE u.Email = @userName AND u.Password = @password AND u.isEnabled;";
+                    $@"select * from User WHERE Email = @userName AND Password = @password AND isEnabled;";
 
-                var enforcedCheckSql =
-                    $@"select * from User WHERE u.Email = @userName AND u.isEnabled = 1";
-                var userDictionary = new Dictionary<int, User>();
-                var user = new User();
+                User user;
 
                 try
                 {
-                    user = (await connection.QueryAsync<User>(enforcedCheckSql,
-                               new {userName, password})).FirstOrDefault() ??
-                           (await connection.QueryAsync<User>(sql,
-                               new {userName, password})).FirstOrDefault();
+                    user = (await connection.QueryAsync<User>(sql,
+                        new {userName, password})).FirstOrDefault();
                 }
                 catch (Exception e)
                 {
@@ -50,7 +45,7 @@ namespace EmployeeControl.repository
                     throw;
                 }
 
-                if (user == null) return user;
+                if (user == null) return null;
 
 
                 // authentication successful so generate jwt token
@@ -62,7 +57,7 @@ namespace EmployeeControl.repository
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                        new Claim(ClaimTypes.Name, user.Id.ToString()),
+                        new Claim(ClaimTypes.Name, user.Id.ToString())
                     }),
                     Expires = DateTime.UtcNow.AddDays(30),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
