@@ -17,5 +17,10 @@ namespace EmployeeContol.service
         {
             return await _repository.AuthenticateAsync(userName, password);
         }
+
+        public async Task<User> GetAsync(int userId)
+        {
+            return await _repository.GetAsync(userId);
+        }
     }
 }

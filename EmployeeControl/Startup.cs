@@ -27,7 +27,6 @@ namespace EmployeeControl
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
             services.AddSwaggerGen();
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddControllers()
@@ -55,6 +54,8 @@ namespace EmployeeControl
         {
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IVacationRepository, VacationRepository>();
+            services.AddTransient<IVacationService, VacationService>();
         }
 
         private void ConfigureJwt(IServiceCollection services)
@@ -83,9 +84,6 @@ namespace EmployeeControl
                         ValidateAudience = false
                     };
                 });
-
-            // // configure DI for application services
-            // services.AddScoped<IUserRepository, UserRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -96,15 +94,22 @@ namespace EmployeeControl
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseSwagger();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("../swagger/v1/swagger.json", "Employee API V1"); });
-            app.UseRouting();
 
+
+            app.UseRouting();
+            // global cors policy
+            // app.UseCors(x => x
+            //     .AllowAnyOrigin()
+            //     .AllowAnyMethod()
+            //     .AllowAnyHeader());
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

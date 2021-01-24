@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using Dapper.Contrib.Extensions;
 using EmployeeContol.model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -57,7 +58,8 @@ namespace EmployeeControl.repository
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                        new Claim(ClaimTypes.Name, user.Id.ToString())
+                        new Claim(ClaimTypes.Name, user.Id.ToString()),
+                        new Claim(ClaimTypes.Role, user.RoleId.ToString())
                     }),
                     Expires = DateTime.UtcNow.AddDays(30),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
@@ -68,6 +70,16 @@ namespace EmployeeControl.repository
                 user.Token = tokenHandler.WriteToken(token);
                 user.Password = null;
 
+                return user;
+            }
+        }
+
+        public async Task<User> GetAsync(int userId)
+        {
+            using (var connection = DataLayer.GetConnection(_configuration))
+            {
+                var user = await connection.GetAsync<User>(userId);
+                user.Password = null;
                 return user;
             }
         }

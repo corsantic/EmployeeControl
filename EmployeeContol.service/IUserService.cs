@@ -6,5 +6,6 @@ namespace EmployeeContol.service
     public interface IUserService
     {
         Task<User> AuthenticateAsync(string userName, string password);
+        Task<User> GetAsync(int userId);
     }
 }
