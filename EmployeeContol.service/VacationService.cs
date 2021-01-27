@@ -22,5 +22,10 @@ namespace EmployeeContol.service
             return await _vacationRepository.GetAsync(userId, roleId);
         }
 
+        public async Task<VacationRequest> ChangeStatusAsync(VacationRequestParameter vacationRequestParameter)
+        {
+            return await _vacationRepository.ChangeStatusAsync(vacationRequestParameter);
+
+        }
     }
 }

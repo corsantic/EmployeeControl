@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using EmployeeContol.model;
 using EmployeeContol.service;
 using Microsoft.AspNetCore.Authorization;
 
@@ -28,12 +29,26 @@ namespace EmployeeControl.Controllers
             try
             {
                 var userId = int.Parse(User.Claims.Single(c => c.Type == ClaimTypes.Name).Value);
-                var roleId= int.Parse(User.Claims.Single(c => c.Type == ClaimTypes.Role).Value);
+                var roleId = int.Parse(User.Claims.Single(c => c.Type == ClaimTypes.Role).Value);
 
                 var res = await _service.GetAsync(userId, roleId);
 
                 return Ok(res);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> ChangeStatus(VacationRequestParameter vacationRequestParameter)
+        {
+            try
+            {
+                var res = await _service.ChangeStatusAsync(vacationRequestParameter);
+                return Ok(res);
             }
             catch (Exception e)
             {

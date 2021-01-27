@@ -7,5 +7,6 @@ namespace EmployeeContol.service
     public interface IVacationService
     {
         Task<IEnumerable<VacationRequest>> GetAsync(int userId, int roleId);
+        Task<VacationRequest> ChangeStatusAsync(VacationRequestParameter vacationRequestParameter);
     }
 }
