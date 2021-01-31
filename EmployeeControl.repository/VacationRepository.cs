@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Dapper;
@@ -29,10 +30,17 @@ namespace EmployeeControl.repository
                 using (var connection = DataLayer.GetConnection(_configuration))
                 {
                     var sql = roleId != (int) RoleEnum.Employer
-                        ? $"select * from VacationRequest where UserId = @userId"
-                        : $"select * from VacationRequest";
+                        ? $"select v.*, u.* from VacationRequest v inner join User u on u.Id = v.UserId where UserId = @userId"
+                        : $"select v.*, u.* from VacationRequest v inner join User u on u.Id = v.UserId";
 
-                    var requestList = await connection.QueryAsync<VacationRequest>(sql, new {userId});
+                    var requestList =
+                        await connection.QueryAsync<VacationRequest, User, VacationRequest>(sql, (v, u) =>
+                            {
+                                v.User = u;
+                                return v;
+                            },
+                            new {userId});
+
 
                     return requestList;
                 }
@@ -51,8 +59,6 @@ namespace EmployeeControl.repository
                 using (var connection = DataLayer.GetConnection(_configuration))
                 {
                     var updateSql = "UPDATE VacationRequest SET Status = @status WHERE Id = @id;";
-
-
                     var updateExecuteResult = await connection.ExecuteAsync(updateSql,
                         new
                         {
@@ -61,8 +67,16 @@ namespace EmployeeControl.repository
                         });
                     Debug.WriteLine(updateExecuteResult);
 
+                    var userVacationRequestSql =
+                        "select v.*, u.* from VacationRequest v inner join User u on u.Id = v.UserId where v.Id = @vacationId";
+
                     var updatedVacationRequest =
-                        await connection.GetAsync<VacationRequest>(vacationRequestParameter.VacationRequestId);
+                        (await connection.QueryAsync<VacationRequest, User, VacationRequest>(userVacationRequestSql,
+                            (v, u) =>
+                            {
+                                v.User = u;
+                                return v;
+                            }, new {vacationId = vacationRequestParameter.VacationRequestId})).SingleOrDefault();
                     return updatedVacationRequest;
                 }
             }
